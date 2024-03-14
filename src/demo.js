@@ -39,14 +39,11 @@ class Demo {
       [-0.4, -0.3]
     ]
 
-    // Draw all the meshes onto the stencil. Each draw inverts the stencil from 1 to 0.
+    // Draw all the meshes onto the stencil. Each draw inverts the stencil from 1 to 0. And from 1 to 0
     for (let i = 0; i < 5; i++) {
-      const ni = i / 4
       const mat = new THREE.MeshBasicMaterial({
-        color: new THREE.Color(ni, ni, ni),
         colorWrite: false,
         stencilFunc: THREE.AlwaysStencilFunc,
-        stencilRef: i,
         stencilWrite: true,
         stencilFail: THREE.InvertStencilOp,
         stencilZFail: THREE.InvertStencilOp,

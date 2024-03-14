@@ -1,51 +1,88 @@
-import "./style.css"
-import { gsap } from "gsap"
-import { Rendering } from "./rendering"
-import * as THREE from "three";
+import './style.css'
+import { gsap } from 'gsap'
+import { Rendering } from './rendering'
+import * as THREE from 'three'
 
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
-import { palettes, sinPalettes } from "./palettes";
-import { getPaletteFromParams, setupControls } from "./utils";
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { palettes, sinPalettes } from './palettes'
+import { getPaletteFromParams, setupControls } from './utils'
 
-// Colors 
-let paletteKey = getPaletteFromParams("blue")
+// Colors
+const paletteKey = getPaletteFromParams('blue')
 
-let palette = palettes[paletteKey]
-let sinPalette = sinPalettes[paletteKey]
+const palette = palettes[paletteKey]
+const sinPalette = sinPalettes[paletteKey]
 
-let sinUniforms = {
-    c0: new THREE.Uniform(sinPalette.c0),
-    c1: new THREE.Uniform(sinPalette.c1),
-    c2: new THREE.Uniform(sinPalette.c2),
-    c3: new THREE.Uniform(sinPalette.c3),
+const sinUniforms = {
+  c0: new THREE.Uniform(sinPalette.c0),
+  c1: new THREE.Uniform(sinPalette.c1),
+  c2: new THREE.Uniform(sinPalette.c2),
+  c3: new THREE.Uniform(sinPalette.c3)
 }
 
 class Demo {
-  constructor(){
-    this.rendering = new Rendering(document.querySelector("#canvas"), palette)
+  constructor () {
+    this.rendering = new Rendering(document.querySelector('#canvas'), palette)
     this.controls = new OrbitControls(this.rendering.camera, this.rendering.canvas)
 
     this.uTime = new THREE.Uniform(0)
     this.init()
   }
-  init(){
-    const box = new THREE.BoxGeometry()
-    const mat = new THREE.MeshNormalMaterial()
+
+  init () {
+    const box = new THREE.PlaneGeometry()
+    const pos = [
+      [0, 0.1],
+      [0.2, 0.1],
+      [-0.2, 0.15],
+      [-0.2, -0.1],
+      [-0.4, -0.3]
+    ]
+    for (let i = 0; i < 5; i++) {
+      const ni = i / 4
+      const mat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color(ni, ni, ni),
+        colorWrite: false,
+        stencilFunc: THREE.AlwaysStencilFunc,
+        stencilRef: i,
+        stencilWrite: true,
+        stencilFail: THREE.InvertStencilOp,
+        stencilZFail: THREE.InvertStencilOp,
+        stencilZPass: THREE.InvertStencilOp
+      })
+      const mesh = new THREE.Mesh(box, mat)
+      mesh.position.x += pos[i][0]
+      mesh.position.y += pos[i][1]
+      mesh.position.z += i * 0.01 + 0.01
+      this.rendering.scene.add(mesh)
+    }
+
+    const mat = new THREE.MeshBasicMaterial({
+      colorWrite: true,
+      stencilFunc: THREE.EqualStencilFunc,
+      stencilWrite: true,
+      depthTest: false
+      // transparent: true
+    })
     const mesh = new THREE.Mesh(box, mat)
+    mesh.renderOrder = 10
+    mesh.scale.setScalar(2)
 
     this.rendering.scene.add(mesh)
 
     this.addEvents()
   }
-  addEvents(){
+
+  addEvents () {
     gsap.ticker.add(this.tick)
   }
-  tick = (time, delta)=>{
-    this.uTime.value += delta;
+
+  tick = (time, delta) => {
+    this.uTime.value += delta
     this.rendering.render()
   }
 }
 
-let demo = new Demo()
+const demo = new Demo()
 
 setupControls(paletteKey)

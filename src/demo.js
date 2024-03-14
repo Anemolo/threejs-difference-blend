@@ -38,6 +38,8 @@ class Demo {
       [-0.2, -0.1],
       [-0.4, -0.3]
     ]
+
+    // Draw all the meshes onto the stencil. Each draw inverts the stencil from 1 to 0.
     for (let i = 0; i < 5; i++) {
       const ni = i / 4
       const mat = new THREE.MeshBasicMaterial({
@@ -57,14 +59,18 @@ class Demo {
       this.rendering.scene.add(mesh)
     }
 
+    // Draw the color background only if the stencil matches the stencilRef
+    // If you wanted colors, create one mesh for the 0 ref and one mesh for the 1 ref
     const mat = new THREE.MeshBasicMaterial({
       colorWrite: true,
+      stencilRef: 0,
       stencilFunc: THREE.EqualStencilFunc,
       stencilWrite: true,
       depthTest: false
-      // transparent: true
     })
+
     const mesh = new THREE.Mesh(box, mat)
+    // This mesh needs to be drawn after all the other meshes. depthTest:false renderOrder = 10
     mesh.renderOrder = 10
     mesh.scale.setScalar(2)
 

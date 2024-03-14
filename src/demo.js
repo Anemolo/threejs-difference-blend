@@ -55,6 +55,7 @@ class Demo {
       const mesh = new THREE.Mesh(box, mat)
       mesh.position.x += pos[i][0]
       mesh.position.y += pos[i][1]
+      // Avoid z fight
       mesh.position.z += i * 0.01 + 0.01
       this.rendering.scene.add(mesh)
     }
